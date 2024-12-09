@@ -1,48 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
-def monte_carlo(X, Y, n):
-    idx = np.random.permutation(n)
-    divisao = int(0.8 * n)
-    idx_treino, idx_teste = idx[:divisao], idx[divisao:]
-
-    X_treino, X_teste = X[idx_treino], X[idx_teste]
-    Y_treino, Y_teste = Y[idx_treino], Y[idx_teste]
-    
-    return X_treino, X_teste, Y_treino, Y_teste
-
-# Funções de ativação 
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
-
-def sigmoid_derivative(x):
-    return sigmoid(x) * (1 - sigmoid(x))
-
-def tanh(x):
-    return np.tanh(x)
-
-def tanh_derivative(x):
-    return 1.0 - tanh(x) ** 2
-
-def relu(x):
-    return np.maximum(0, x)
-
-def relu_derivative(x):
-    return 1.0 * (x > 0)
-
-def leaky_relu(x):
-    return np.maximum(0.01 * x, x)
-
-def leaky_relu_derivative(x):
-    dx = np.ones_like(x)
-    dx[x < 0] = 0.01
-    return dx
-
-def linear(x):
-    return x
-
-def sign(u):
-    return 1 if u >= 0 else -1
+from utils import *
+from perceptron import *
+from adaline import *
 
 # Entrada de Dados
 arquivo = 'spiral.csv'
@@ -64,8 +24,8 @@ plt.title('Dados Spiral')
 plt.xlabel('X1')
 plt.ylabel('X2')
 plt.legend()
-plt.grid()
-plt.show()
+plt.xlim(-20,20)
+plt.ylim(-20,20)
 
 # Parte 2 - Percepton Simples
 X = X.T
@@ -76,26 +36,45 @@ X = np.concatenate((
     X)
 )
 
-#Modelo do Perceptron Simples:
+# Modelo do Perceptron Simples:
 lr = .001 # Definição do hiperparâmetro Taxa de Aprendizado (Learning Rate)
 
-#Inicialização dos parâmetros (pesos sinápticos e limiar de ativação):
+# Inicialização dos parâmetros (pesos sinápticos e limiar de ativação):
 w = np.zeros((3,1)) # todos nulos
 w = np.random.random_sample((3,1))-.5 # parâmetros aleatórios entre -0.5 e 0.5
 
+# Plot da reta que representa o modelo do perceptron simples em sua inicialização:
+x_axis = np.linspace(-30,30)
+x2 = -w[1,0]/w[2,0]*x_axis + w[0,0]/w[2,0]
+x2 = np.nan_to_num(x2)
+plt.plot(x_axis,x2,color='k')
 
 
-# Executar Perceptron
-learning_rate = 0.005
-erro_minimo = 0.005
-epocas = 100
+#condição inicial
+erro = True
+epoca = 0 #inicialização do contador de épocas.
+while(erro):
+    erro = False
+    for t in range(N):
+        x_t = X[:,t].reshape(p+1,1)
+        u_t = (w.T@x_t)[0,0]
+        y_t = sign(u_t)
+        d_t = float(Y[0,t])
+        e_t = d_t - y_t
+        w = w + (lr*e_t*x_t)/2
+        if(y_t!=d_t):
+            erro = True
+    #plot da reta após o final de cada época
+    plt.pause(.01)    
+    x2 = -w[1,0]/w[2,0]*x_axis + w[0,0]/w[2,0]
+    x2 = np.nan_to_num(x2)
+    plt.plot(x_axis,x2,color='orange',alpha=.1)
+    epoca+=1
 
-result_perceptron = []
-
-for i in range(10):
-    X_train, X_test, y_train, y_test = monte_carlo(X, Y, N)
-    
-    
-
+#fim do treinamento
+x2 = -w[1,0]/w[2,0]*x_axis + w[0,0]/w[2,0]
+x2 = np.nan_to_num(x2)
+line = plt.plot(x_axis, x2, color='green', linewidth=3)
+plt.show()
 
 bp = 1
