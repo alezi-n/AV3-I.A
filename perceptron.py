@@ -33,9 +33,9 @@ def treinar_PRT(X_train, y_train, max_epocas=1200, taxa_aprendizado=0.0005):
   return w
 
 # Função de teste do Perceptron
-def testar_perceptron(X, W):
-    _, N = X.shape
-    X = np.concatenate((-np.ones((1, N)), X))  # Adicionar bias
-    u = np.dot(W.T, X)  # Saída linear
+def testar_PRT(X_test, W):
+    _, N = X_test.shape
+    X_test = np.concatenate((-np.ones((1, N)), X_test))  # Adicionar bias
+    u = np.dot(W.T, X_test)  # Saída linear
     Y_pred = sign(u)  # Aplicar função degrau
     return Y_pred

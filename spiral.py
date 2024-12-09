@@ -34,7 +34,7 @@ for _ in range(5):
     
   # Treinamento do Perceptron
   w = treinar_PRT(X_treino, Y_treino) # Treinamento do Perceptron
-  Y_pred = testar_perceptron(X_teste.T, w) # Teste do Perceptron
+  Y_pred = testar_PRT(X_teste.T, w) # Teste do Perceptron
   r_acuracia, r_sensibilidade, r_especificidade = calcular_metricas(Y_teste, Y_pred.T) # Calcular métricas
   PRP_resultados.append((r_acuracia, r_sensibilidade, r_especificidade, Y_teste, Y_pred, w, X_treino, Y_treino))
   PRP_acuracia.append(r_acuracia)
