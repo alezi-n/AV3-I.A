@@ -1,14 +1,34 @@
 import numpy as np
 
-def monte_carlo(X, Y, n):
-  idx = np.random.permutation(n)
-  divisao = int(0.8 * n)
-  idx_treino, idx_teste = idx[:divisao], idx[divisao:]
-
-  X_treino, X_teste = X[idx_treino], X[idx_teste]
-  Y_treino, Y_teste = Y[idx_treino], Y[idx_teste]
+def calcular_metricas(y_verdadeiro, y_predito):
+  # Converte os valores para formato 1D
+  y_verdadeiro = y_verdadeiro.flatten()
+  y_predito = y_predito.flatten()
     
-  return X_treino, X_teste, Y_treino, Y_teste
+  # Matrizes de confusão
+  VP = np.sum((y_verdadeiro == 1) & (y_predito == 1))
+  VN = np.sum((y_verdadeiro == -1) & (y_predito == -1))
+  FP = np.sum((y_verdadeiro == -1) & (y_predito == 1))
+  FN = np.sum((y_verdadeiro == 1) & (y_predito == -1))
+    
+  # Cálculo das métricas
+  acuracia = (VP + VN) / len(y_verdadeiro)
+  sensibilidade = VP / (VP + FN) if (VP + FN) > 0 else 0
+  especificidade = VN / (VN + FP) if (VN + FP) > 0 else 0
+    
+  return acuracia, sensibilidade, especificidade
+
+def matriz_confusao(y_verdadeiro, y_predito):
+  y_verdadeiro = y_verdadeiro.flatten()
+  y_predito = y_predito.flatten()
+
+  VP = np.sum((y_verdadeiro == 1) & (y_predito == 1))
+  VN = np.sum((y_verdadeiro == -1) & (y_predito == -1))
+  FP = np.sum((y_verdadeiro == -1) & (y_predito == 1))
+  FN = np.sum((y_verdadeiro == 1) & (y_predito == -1))
+
+  matriz = np.array([[VP, FN], [FP, VN]])
+  return matriz
 
 # Funções de ativação 
 def sigmoid(x):
@@ -41,4 +61,4 @@ def linear(x):
   return x
 
 def sign(u):
-  return 1 if u >= 0 else -1
+  return np.where(u >= 0, 1, -1)

@@ -1,74 +1,41 @@
 import numpy as np
-from utils import *
+import matplotlib.pyplot as plt
+from utils import *  # Certifique-se de que a função `sign` esteja implementada aqui.
 
-def treinar_PRT(X_train, y_train, learning_rate, erro_minimo, epocas):
+# Função de treinamento do Perceptron
+def treinar_PRT(X_train, y_train, max_epocas=1200, taxa_aprendizado=0.0005):
+  # Transposição para adequar dimensões
   X_train = X_train.T
-  X_train = np.concatenate((-np.ones((1, X_train.shape[1])), X_train), axis=0)
-
-  y_train.shape = (len(y_train), 1)
-
-  W = np.random.random_sample((X_train.shape[0], 1)) - 0.5
-
-  epoch = 0
-
-  while True:
-    epoch += 1
-    acertos = 0
-    total_error = 0
-    for t in range(X_train.shape[1]):
-        x_t = X_train[:, t].reshape(X_train.shape[0], 1)
-        u_t = W.T @ x_t
-        y_t = sigmoid(u_t[0, 0])
-
-        # Define o limiar de classificação
-        y_t = 1 if y_t > 0.6 else -1
-
-        d_t = y_train[t, 0]
-        if y_t == d_t:
-            acertos += 1
-        error = d_t - y_t
-        W = W + learning_rate * error * x_t
-        total_error += abs(error)
-
-
-    mean_error = total_error / X_train.shape[1]
-
-    if mean_error < erro_minimo or epoch >= epocas:
-        break
-      
-  acuracia = acertos / X_train.shape[1]
-  return acuracia
-
-def prever_PRT(X_test, W):
-  X_test = X_test.T
-  X_test = np.concatenate((-np.ones((1, X_test.shape[1])), X_test), axis=0)
-
-  y_pred = []
-  
-  for t in range(X_test.shape[1]):
-    x_t = X_test[:, t].reshape(X_test.shape[0], 1)
-    u_t = W.T @ x_t
-    y_t = sigmoid(u_t[0, 0])
-    y_t = 1 if y_t > 0.6 else -1
-    y_pred.append(y_t)
+  y_train = y_train.T
+  p, N = X_train.shape
     
-  return np.array(y_pred)
+  # Adicionar o viés (bias)
+  X = np.concatenate((-np.ones((1, N)), X_train))  # Dimensão: (p+1, N)
+    
+  # Inicialização dos pesos
+  w = np.random.uniform(-0.5, 0.5, (p + 1, 1))  # Dimensão: (p+1, 1)
+    
+  erro = True
+  epoca = 0
+  while erro and epoca < max_epocas:
+    erro = False
+    for t in range(N):
+      x_t = X[:, t].reshape(p + 1, 1)  # Vetor coluna
+      u_t = (w.T @ x_t)[0, 0]  # Saída linear
+      y_t = sign(u_t)  # Aplicar função degrau
+      d_t = float(y_train[0, t])  # Valor esperado
+      e_t = d_t - y_t  # Erro
+            
+      if y_t != d_t:
+        w += taxa_aprendizado * e_t * x_t
+        erro = True
+    epoca += 1
+  return w
 
-def acuracia_PRT(X, y, W):
-  X = X.T
-  X = np.concatenate((-np.ones((1, X.shape[1])), X), axis=0)
-
-  y.shape = (len(y), 1)
-
-  acertos = 0
-  for t in range(X.shape[1]):
-    x_t = X[:, t].reshape(X.shape[0], 1)
-    u_t = W.T @ x_t
-    y_t = sigmoid(u_t[0, 0])
-    y_t = 1 if y_t >= 0.6 else -1
-    d_t = y[t, 0]
-    if y_t == d_t:
-      acertos += 1
-      
-  acuracia = acertos / X.shape[1]
-  return acuracia
+# Função de teste do Perceptron
+def testar_perceptron(X, W):
+    _, N = X.shape
+    X = np.concatenate((-np.ones((1, N)), X))  # Adicionar bias
+    u = np.dot(W.T, X)  # Saída linear
+    Y_pred = sign(u)  # Aplicar função degrau
+    return Y_pred
