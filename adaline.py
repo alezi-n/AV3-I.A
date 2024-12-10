@@ -1,60 +1,54 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from utils import *
 
-def treinar_ADL(X_train, y_train, learning_rate, erro_minimo, epocas):
-  X_train = X_train.T
-  X_train = np.concatenate((-np.ones((1, X_train.shape[1])), X_train), axis=0)
+# Função EQM
+def EQM(X,Y,w):
+  p_1,N = X.shape
+  eq = 0
+  for t in range(N):
+    x_t = X[:,t].reshape(p_1,1)
+    u_t = w.T@x_t
+    d_t = Y[0,t]
+    eq += (d_t-u_t[0,0])**2
+  return eq/(2*N)
 
-  y_train.shape = (len(y_train), 1)
+# Função de treinamento do Perceptron
+def treinar_ADL(X_train, Y_train, max_epocas=10000, lr=0.02, pr=1e-5):
+  X_train = X_train
+  Y_train = Y_train.T
+  p, N = X_train.shape
+    
+  # Adicionar o viés (bias)
+  X_train = np.concatenate((-np.ones((1, N)), X_train))  # Dimensão: (p+1, N)
+    
+  # Inicialização dos pesos
+  w = np.random.uniform(-0.5, 0.5, (p + 1, 1))  # Dimensão: (p+1, 1)
+    
+  EQM1 = 1
+  EQM2 = 0
+  epochs = 0
+  hist = []
+  while epochs < max_epocas and abs(EQM1 - EQM2) > pr:
+    EQM1 = EQM(X_train, Y_train, w)
+    hist.append(EQM1)
+    for t in range(N):
+      x_t = X_train[:, t].reshape(p + 1, 1)
+      u_t = w.T @ x_t
+      d_t = Y_train[0, t]
+      e_t = d_t - u_t
+      w = w + lr * e_t * x_t
+    epochs += 1
+    EQM2 = EQM(X_train, Y_train, w)
+  return w, hist
 
-  W = np.random.random_sample((X_train.shape[0], 1)) - 0.5
-
-  epoch = 0
-
-  while True:
-      epoch += 1
-      total_error = 0
-      for t in range(X_train.shape[1]):
-          x_t = X_train[:, t].reshape(X_train.shape[0], 1)
-          u_t = W.T @ x_t
-          y_t = u_t[0, 0]
-
-          d_t = y_train[t, 0]
-          error = d_t - y_t
-          W = W + learning_rate * error * x_t
-          total_error += abs(error)
-
-      mean_error = total_error / X_train.shape[1]
-
-      if mean_error < erro_minimo or epoch >= epocas:
-          break
-
-def prever_ADL(X_test, W):
-  X_test = X_test.T
-  X_test = np.concatenate((-np.ones((1, X_test.shape[1])), X_test), axis=0)
-
-  y_pred = []
-  for t in range(X_test.shape[1]):
-      x_t = X_test[:, t].reshape(X_test.shape[0], 1)
-      u_t = W.T @ x_t
-      y_t = u_t[0, 0]
-      y_t = 1 if y_t > 0.7 else -1
-      y_pred.append(y_t)
-  return np.array(y_pred)
-
-def acuracia_ADL(X, y, W):
-  X = X.T
-  X = np.concatenate((-np.ones((1, X.shape[1])), X), axis=0)
-
-  y.shape = (len(y), 1)
-
-  acertos = 0
-  for t in range(X.shape[1]):
-      x_t = X[:, t].reshape(X.shape[0], 1)
-      u_t = W.T @ x_t
-      y_t = u_t[0, 0]
-      y_t = 1 if y_t > 0.6 else -1
-      d_t = y[t, 0]
-      if y_t == d_t:
-          acertos += 1
-  acuracia = acertos / X.shape[1]
-  return acuracia
+# Função de teste do Adaline
+def testar_ADL(X, W):
+  N = X.shape[1]
+  # Adicionar o bias ao conjunto de teste
+  X = np.vstack((-np.ones((1, N)), X))  # Adiciona o bias
+  # Multiplicação de W transposto para combinar dimensões
+  Y_pred = W.T @ X  # Predição linear (dimensões resultantes: (1, N))
+  # Aplicar a função de classificação
+  Y_pred = np.where(Y_pred >= 0, 1, -1)  # Classificação para +1 ou -1
+  return Y_pred

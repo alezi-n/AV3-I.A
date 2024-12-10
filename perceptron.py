@@ -1,6 +1,6 @@
+from utils import *
 import numpy as np
 import matplotlib.pyplot as plt
-from utils import *  # Certifique-se de que a função `sign` esteja implementada aqui.
 
 # Função de treinamento do Perceptron
 def treinar_PRT(X_train, y_train, max_epocas=1200, taxa_aprendizado=0.0005):

@@ -22,6 +22,12 @@ PRP_resultados = []
 PRP_acuracia = []
 PRP_sensibilidade = []
 PRP_especificidade = []
+# Adaline
+ADL_resultados = []
+ADL_acuracia = []
+ADL_sensibilidade = []
+ADL_especificidade = []
+
 
 # Parte 2 - Treinamento e Teste
 for _ in range(5):
@@ -33,13 +39,22 @@ for _ in range(5):
   Y_treino, Y_teste = Y[idx_treino], Y[idx_teste]
     
   # Treinamento do Perceptron
-  w = treinar_PRT(X_treino, Y_treino) # Treinamento do Perceptron
-  Y_pred = testar_PRT(X_teste.T, w) # Teste do Perceptron
-  r_acuracia, r_sensibilidade, r_especificidade = calcular_metricas(Y_teste, Y_pred.T) # Calcular métricas
-  PRP_resultados.append((r_acuracia, r_sensibilidade, r_especificidade, Y_teste, Y_pred, w, X_treino, Y_treino))
+  w_perceptron = treinar_PRT(X_treino, Y_treino) # Treinamento do Perceptron
+  Y_pred_perceptron = testar_PRT(X_teste.T, w_perceptron) # Teste do Perceptron
+  r_acuracia, r_sensibilidade, r_especificidade = calcular_metricas(Y_teste, Y_pred_perceptron.T) # Calcular métricas
+  PRP_resultados.append((r_acuracia, r_sensibilidade, r_especificidade, Y_teste, Y_pred_perceptron, w_perceptron, X_treino, Y_treino)) 
   PRP_acuracia.append(r_acuracia)
   PRP_sensibilidade.append(r_sensibilidade)
   PRP_especificidade.append(r_especificidade)
+  
+  # Treinamento do Adaline
+  w_adaline = treinar_PRT(X_treino, Y_treino) # Treinamento do Adaline
+  Y_pred_adaline = testar_ADL(X_teste.T, w_adaline) # Teste do Adaline
+  r_acuracia, r_sensibilidade, r_especificidade = calcular_metricas(Y_teste, Y_pred_adaline.T) # Calcular métricas
+  ADL_resultados.append((r_acuracia, r_sensibilidade, r_especificidade, Y_teste, Y_pred_adaline, w_adaline, X_treino, Y_treino))
+  ADL_acuracia.append(r_acuracia)
+  ADL_sensibilidade.append(r_sensibilidade)
+  ADL_especificidade.append(r_especificidade)
 
 # Matriz de Confusão
 PRP_resultados.sort(key=lambda x: x[0])  # Ordena pelo valor de acurácia
