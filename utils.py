@@ -30,12 +30,23 @@ def matriz_confusao(y_verdadeiro, y_predito):
   matriz = np.array([[VP, FN], [FP, VN]])
   return matriz
 
-# Funções de ativação 
+# Funções de ativação
+def sign(u):
+  return np.where(u >= 0, 1, -1)
+
 def sigmoid(x):
   return 1 / (1 + np.exp(-x))
 
 def sigmoid_derivative(x):
   return sigmoid(x) * (1 - sigmoid(x))
+
+# Função para inicializar os pesos da rede
+def inicializar_pesos(arquitetura):
+  pesos = []
+  for i in range(len(arquitetura) - 1):
+    w = np.random.uniform(-0.5, 0.5, (arquitetura[i + 1], arquitetura[i] + 1))
+    pesos.append(w)
+  return pesos
 
 def tanh(x):
   return np.tanh(x)
@@ -59,6 +70,3 @@ def leaky_relu_derivative(x):
 
 def linear(x):
   return x
-
-def sign(u):
-  return np.where(u >= 0, 1, -1)
