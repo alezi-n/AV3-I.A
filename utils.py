@@ -57,9 +57,9 @@ def matriz_confusao(y_verdadeiro, y_predito):
   y_predito = y_predito.flatten()
 
   VP = np.sum((y_verdadeiro == 1) & (y_predito == 1))
-  VN = np.sum((y_verdadeiro == -1) & (y_predito == -1))
-  FP = np.sum((y_verdadeiro == -1) & (y_predito == 1))
-  FN = np.sum((y_verdadeiro == 1) & (y_predito == -1))
+  VN = np.sum((y_verdadeiro == 0) & (y_predito == 0))
+  FP = np.sum((y_verdadeiro == 0) & (y_predito == 1))
+  FN = np.sum((y_verdadeiro == 1) & (y_predito == 0))
 
   matriz = np.array([[VP, FN], [FP, VN]])
   return matriz
